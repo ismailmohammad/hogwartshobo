@@ -2,9 +2,11 @@ import pygame
 import random
 import time
 
+MAX_HEALTH = 100.0
+
 pygame.init()
-screen_width = 1200
-screen_height = 600
+screen_width = 1920
+screen_height = 1080
 fps = 30
 
 finish = False
@@ -33,7 +35,7 @@ class Train(pygame.sprite.Sprite):
         self.img = train
         self.speed = speed
         self.direction = direction  # -1 - left, 1 - right
-        self.width = width
+        self.width = width  
         self.height = height
         self.image = train
 
@@ -55,10 +57,11 @@ class Train(pygame.sprite.Sprite):
         for hobo in user_hobos:
             if (self.rect.colliderect(hobo) and hobo.dead == False):
                 hobo.hurt()
+                hobo.draw_health()
 
 class Hobo(pygame.sprite.Sprite):
     dead = False
-    health = 100
+    health = MAX_HEALTH
 
     def __init__(self, xpos, ypos, size):
         pygame.sprite.Sprite.__init__(self)
@@ -72,19 +75,21 @@ class Hobo(pygame.sprite.Sprite):
     # Update hobo position based on key presses
     def update(self, direction):
         # direction being 1 for up and -1 for down
-        if (direction == 1):
+        if (direction == 1 and self.rect.y > 270):
             self.rect.y -= 112.5
             # go down
-        elif (direction == -1):
+        elif (direction == -1 and self.rect.y < 400):
             self.rect.y += 112.5
-            
-                
-
+    
+    def draw_health(self):
+        # Set initial color to Green
+        bar_color = (0,255,0)
+        health_bar_width = (self.health / MAX_HEALTH) * 50.00
+        pygame.draw.rect(self.image, bar_color, [0, 0, health_bar_width, 5])
+        
     # If hobo is hurt, decrease health as necessary
     def hurt(self):
-        # self.image = frogDead
-        # self.dead = True
-        self.health -= 5
+        self.health -= 1
         if self.health == 0:
             self.dead = True
             self.kill()
