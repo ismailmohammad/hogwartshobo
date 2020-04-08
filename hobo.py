@@ -5,8 +5,8 @@ import time
 MAX_HEALTH = 100.0
 
 pygame.init()
-screen_width = 1920
-screen_height = 1080
+screen_width = 1295
+screen_height = 600
 fps = 30
 
 finish = False
@@ -24,6 +24,12 @@ train = pygame.image.load('images/train.png')
 
 game_sprites = pygame.sprite.Group()
 backgroundImage = pygame.image.load('images/background.png')
+
+# Set up them music (Feel free to replace the music peeps)
+pygame.mixer.music.load('media/bg_music.mp3') 
+pygame.mixer.music.play(-1,0.0)
+
+damage_sound_effect = pygame.mixer.Sound('media/not_the_roblox_death_sound.wav')
 
 class Train(pygame.sprite.Sprite):
     def __init__(self, startX, startY, speed, direction, width, height):
@@ -90,6 +96,7 @@ class Hobo(pygame.sprite.Sprite):
     # If hobo is hurt, decrease health as necessary
     def hurt(self):
         self.health -= 1
+        damage_sound_effect.play()
         if self.health == 0:
             self.dead = True
             self.kill()
