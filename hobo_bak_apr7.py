@@ -1,45 +1,43 @@
 import pygame
-from pygame.locals import *
+import random
 import time
 import os
+
+MAX_HEALTH = 100.0
+WHITE = (255,255,255)
+FIRST_TRAIN_YPOS  = 270
+TRACK_Y_TARGETS = [FIRST_TRAIN_YPOS, FIRST_TRAIN_YPOS + 112.5, FIRST_TRAIN_YPOS + 225]
 
 pygame.init()
 screen_width = 1295
 screen_height = 620
-fps = 30
+fps = 60
 
 finish = False
-# screen=pygame.display.set_mode((screen_width, screen_height), RESIZABLE)
-screen=pygame.display.set_mode((screen_width, screen_height))
+screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Hogwarts Hobo')
 clock = pygame.time.Clock()
 
-# Steps of 117 ie. divisible by 9 sprite frames
-TRAIN_POSITIONS = [270, 387, 504]
-INITIAL_Y = TRAIN_POSITIONS[0]
-INITIAL_X = 200
-HOBO_SPEED = 13
-# reimplement later to change things up
-TRAIN_SPEED = 1
-MAX_HEALTH = 100
 
-# Set up backgroynd image
-backgroundImage = pygame.image.load('images/background.png')
+hobos = pygame.sprite.Group()
 
-# Create Sprite group for the user's char
-user_sprites = pygame.sprite.Group()
-# Create global variable user_hobo to be initialized later
-user_hobo = 0
+user_hobos = pygame.sprite.Group()
 
-# Load the train image and create sprite 
 train = pygame.image.load('images/train.png')
-trains = pygame.sprite.Group()
+
+
+game_sprites = pygame.sprite.Group()
+backgroundImage = pygame.image.load('images/background.png')
 
 # Set up them music (Feel free to replace the music peeps)
 pygame.mixer.music.load('media/bg_music.mp3') 
 pygame.mixer.music.play(-1,0.0)
-# Set up Damage sound upon collision
+
 damage_sound_effect = pygame.mixer.Sound('media/not_the_roblox_death_sound.wav')
+
+# Set font for the Text
+font = pygame.font.Font('freesansbold.ttf', 32) 
+
 
 class Train(pygame.sprite.Sprite):
     def __init__(self, startX, startY, speed, direction, width, height):
@@ -69,7 +67,7 @@ class Train(pygame.sprite.Sprite):
         self.collision()
 
     def collision(self):
-        for hobo in user_sprites:
+        for hobo in user_hobos:
             if (self.rect.colliderect(hobo) and hobo.dead == False):
                 hobo.hurt()
 
@@ -83,58 +81,46 @@ class Hobo(pygame.sprite.Sprite):
         self.size = size
         self.images = []
         # Load all the sprite images into the image array
-        for index in range(9):
-            sprite_frame = pygame.image.load(os.path.join('images','sprite_' + str(index) + '.png')).convert_alpha()
-            sprite_frame.set_colorkey(0)
-            sprite_frame.set_alpha(0)
+        for index in range(0,9):
+            sprite_frame = pygame.image.load(os.path.join('images','sprite_' + str(index) + '.png'))
             self.images.append(sprite_frame)
-        # Select the default sprite img
         self.image = self.images[self.frame_index]
         self.rect = self.image.get_rect()
         self.rect.x = xpos
         self.rect.y = ypos
+        self.surface = pygame.Surface((self.rect.width, self.rect.height))
 
     # Update hobo position based on key presses
-    def update(self, direction, speed):
+    def update(self, direction):
         # direction being 1 for up and -1 for down
-        if (direction == 1 and self.rect.y > TRAIN_POSITIONS[0]):
-            self.frame_index = 0
-            for frame in self.images:
-                self.changeSpriteFrame()
-                self.rect.y -= 6
-                render()
-                self.rect.y -= 7
-                render(True)
+        if (direction == 1 and self.rect.y > 270):
+            self.animateJump()
+            self.rect.y -= 12.5
             # go down
-        elif (direction == -1 and self.rect.y < TRAIN_POSITIONS[2]):
-            self.frame_index = 0
-            moved = 0
-            for frame in self.images:
-                self.changeSpriteFrame()
-                self.rect.y += 6
-                moved += 6
-                render()
-                self.rect.y += 7
-                moved += 7
-                render(True)
-            print("moved down: " + str(moved))
-                
+        elif (direction == -1 and self.rect.y < 495):
+            self.animateJump()
+            self.rect.y += 12.5
 
-    def changeSpriteFrame(self):
+
+    def animateJump(self):
         self.frame_index += 1
         if self.frame_index == len(self.images):
             self.frame_index = 0
         self.image = self.images[self.frame_index]
-        
+
+    def displayName(self):
+        text , tr = displayMessage("Not Bob", font, WHITE)
+        self.surface.blit(text, tr)
 
     def updateHealth(self):
         # Set initial color to Green
         self.bar_color = (0,255,0)
         self.health_bar_width = (self.health / MAX_HEALTH) * 50.00
-
+        
+    # If hobo is hurt, decrease health as necessary
     def hurt(self):
         self.health -= 1
-        # self.updateHealth()
+        self.updateHealth()
         damage_sound_effect.play()
         if self.health == 0:
             self.dead = True
@@ -144,36 +130,49 @@ class Hobo(pygame.sprite.Sprite):
             quit()
         print("HObo Health: " + str(self.health))
 
-def addSprites():
-    # Create the user's hobo and add it to the Sprite group of user controlled sprites
-    global user_hobo
-    user_hobo = Hobo(1000,INITIAL_Y,50)
-    user_sprites.add(user_hobo)
+
+def displayMessage(text, font, color):
+    text = font.render(text, True, color)
+    text_rectangle = text.get_rect()
+    return (text, text_rectangle)
+        
+
+
+# Make the user hobo then init game with it
+# (x,y, size)
+user_hobo = Hobo(1000,200,50)
+
+# Sets and resets the game screen
+def initialize_game(user_hobo):
+
+    for sprite in game_sprites:
+        sprite.kill()
+
+    #  change thihs up later to randomize them tings
+    train_speed = 1
     # set the width and height of dem trains
     (width, height) = (100, 50)
+    # set up hobo on the tracks too
+    user_hobo.rect.y = FIRST_TRAIN_YPOS
     # Create 3 trains (randomize frequency and speeed later)
     # (x, y,speed, direction, width, height)
-    trains.add(Train(50 + 150 * (12 - 1), TRAIN_POSITIONS[0], TRAIN_SPEED, -1, width, height))
-    trains.add(Train(50 + 150 * (12 - 2 * 5), TRAIN_POSITIONS[1] , TRAIN_SPEED + 1, -1, width, height))
-    trains.add(Train(50 + 150 * (12 - 3 * 5), TRAIN_POSITIONS[2], TRAIN_SPEED + 2, -1, width, height))
+    for i in range(0, 3):
+        if (i == 1):
+            game_sprites.add(Train(50 + 150 * (12 - i), FIRST_TRAIN_YPOS, train_speed, -1, width, height))
+        elif i == 2:
+            game_sprites.add(Train(50 + 150 * (12 - i * 5), FIRST_TRAIN_YPOS + 112.5 , train_speed + 2, -1, width, height))
+        else:
+            game_sprites.add(Train(50 + 150 * (12 - i * 5), FIRST_TRAIN_YPOS + 225, train_speed + 4, -1, width, height))
+    # add the user controlled hobo man ting
+    user_hobos.add(user_hobo)
 
-def render(hoboMoving = False):
-    # bg -> hobo -> trains
-    screen.blit(backgroundImage, (0, 0))
-    # pygame.draw.rect(screen, colors[color_index], (x, y, 70, 70))
-    user_sprites.update(0, 0)
-    user_sprites.draw(screen)
-    if not hoboMoving:
-        trains.update()
-    trains.draw(screen)
-    # pygame.draw.rect(screen, (0,0,0,25), (user_hobo.rect.x, user_hobo.rect.y, user_hobo.rect.height, user_hobo.rect.width))
-    pygame.display.update()
+initialize_game(user_hobo)
 
-    # screen.fill((0,0,0))
+# Display Health Text
+ht_surface, ht_rect = displayMessage("Health:", font, WHITE)
+ht_rect.y += 5
+ht_rect.x += 5
 
-
-# Add the sprites into their respective groups then start
-addSprites()
 
 while not finish:
     for event in pygame.event.get():
@@ -181,14 +180,30 @@ while not finish:
             finish = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP or event.key == ord('w'):
-                user_sprites.update(1, 12.5)
-                print("y: " + str(user_hobo.rect.y));
+                for i in range (9):
+                    user_hobo.update(1)
             if event.key == pygame.K_DOWN or event.key == ord('s'):
-                user_sprites.update(-1, 12.5)
-                print("y: " + str(user_hobo.rect.y));
-    render()
-    
+                for i in range (9):
+                    user_hobo.update(-1)
+            
+
+    screen.blit(backgroundImage, (0, 0))
+
+    # draw the user hobo onto the screen
+    user_hobos.update(0)
+    user_hobos.draw(screen)
+
+    user_hobo.displayName()
+
+    game_sprites.update()
+    game_sprites.draw(screen)
+    # to be used later to create bare hobos
+    # hobos.update()
+    # hobos.draw(screen)
+
+    pygame.display.update()
     clock.tick(fps)
+
 
 pygame.quit()
 quit()
