@@ -5,13 +5,13 @@ import os
 
 pygame.init()
 screen_width = 1295
-screen_height = 700
+screen_height = 800
 fps = 30
 
 finish = False
 game_over = False
-# screen=pygame.display.set_mode((screen_width, screen_height), RESIZABLE)
-screen=pygame.display.set_mode((screen_width, screen_height))
+screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
+# screen=pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Hogwarts Hobo')
 clock = pygame.time.Clock()
 
@@ -170,7 +170,6 @@ class Hobo(pygame.sprite.Sprite):
             # Play game over sfx
             pygame.mixer.music.load(gameover_sfx) 
             pygame.mixer.music.play()
-            # Display Visual confirmation of game end
 
         print("HObo Health: " + str(self.health))
 
@@ -204,7 +203,7 @@ def render(hoboMoving = False):
     if (not hoboMoving) and (not game_over):
         trains.update()
     if game_over:
-        screen.blit(game_over_img, (game_over_img.get_rect().centerx, 0))
+        screen.blit(game_over_img, (screen.get_rect().centerx - (game_over_img.get_rect().width/2), backgroundImage.get_rect().height))
     trains.draw(screen)
     # pygame.draw.rect(screen, (0,0,0,25), (user_hobo.rect.x, user_hobo.rect.y, user_hobo.rect.height, user_hobo.rect.width))
     pygame.display.update()
@@ -230,5 +229,10 @@ while not finish:
     
     clock.tick(fps)
 
+    if (game_over):
+        finish = True
+# Render Final Frame and wait x seconds before exiting
+render()
+time.sleep(10)
 pygame.quit()
 quit()
