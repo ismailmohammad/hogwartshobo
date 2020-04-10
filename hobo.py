@@ -14,8 +14,8 @@ game_over = False
 
 # IMPORTANT: Uncomment one or the other for debug purposes, not a lot of screen switching, debug use w/o FS
 
-# screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
-screen=pygame.display.set_mode((screen_width, screen_height))
+screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
+# screen=pygame.display.set_mode((screen_width, screen_height))
 
 pygame.display.set_caption('Hogwarts Hobo')
 
