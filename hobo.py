@@ -6,13 +6,19 @@ import os
 pygame.init()
 screen_width = 1295
 screen_height = 800
-fps = 30
+fps = 60
 
 finish = False
+quit_induced = False
 game_over = False
-screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
-# screen=pygame.display.set_mode((screen_width, screen_height))
+
+# IMPORTANT: Uncomment one or the other for debug purposes, not a lot of screen switching, debug use w/o FS
+
+# screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
+screen=pygame.display.set_mode((screen_width, screen_height))
+
 pygame.display.set_caption('Hogwarts Hobo')
+
 clock = pygame.time.Clock()
 
 # Steps of 117 ie. divisible by 9 sprite frames
@@ -34,6 +40,8 @@ user_sprites = pygame.sprite.Group()
 user_hobo = 0
 # Create a group to hold the user's health indicator
 user_health = pygame.sprite.Group()
+# Used because the sprites in group are hashed, simplicity sake
+hearts = []
 
 # Load the train image and create sprite 
 train = pygame.image.load('images/train.png')
@@ -148,22 +156,15 @@ class Hobo(pygame.sprite.Sprite):
         self.image = self.images[self.frame_index]
         
 
-    def updateHealth(self):
-        # Set initial color to Green
-        self.bar_color = (0,255,0)
-        self.health_bar_width = (self.health / MAX_HEALTH) * 50.00
-
     def hurt(self):
         self.health -= 1
         # self.updateHealth()
         damage_sound_effect.play()
         if (self.health in [0,25,50,75]):
-            for heart in user_health:
-                heart.kill()
-                
+            hearts[len(user_health.sprites()) - 1].kill()
         if self.health == 0:
             self.dead = True
-            self.kill()
+            self.image = self.hurt_image
             global game_over 
             game_over = True
             print("game over, your hobo died lol")
@@ -182,7 +183,9 @@ def addSprites():
     heart_number = 0
     heart_size = 50
     while heart_number < 4:
-        user_health.add(Heart(0 + (heart_number * heart_size), backgroundImage.get_rect().height + 5, heart_size))
+        heart = Heart(0 + (heart_number * heart_size), backgroundImage.get_rect().height + 5, heart_size)
+        user_health.add(heart)
+        hearts.append(heart)
         heart_number += 1
     # set the width and height of the trains
     (width, height) = (100, 50)
@@ -193,18 +196,19 @@ def addSprites():
     trains.add(Train(50 + 150 * (12 - 3 * 5), TRAIN_POSITIONS[2], TRAIN_SPEED + 2, -1, width, height))
 
 def render(hoboMoving = False):
-    # bg -> hobo -> trains
+    # Render Sequence: fill black -> bg -> hobo -> trains -> health
+    screen.fill(0)
     screen.blit(backgroundImage, (0, 0))
     # pygame.draw.rect(screen, colors[color_index], (x, y, 70, 70))
     user_sprites.update(0, 0)
     user_sprites.draw(screen)
-    # Draw the user's health onto the screen
-    user_health.draw(screen)
     if (not hoboMoving) and (not game_over):
         trains.update()
     if game_over:
         screen.blit(game_over_img, (screen.get_rect().centerx - (game_over_img.get_rect().width/2), backgroundImage.get_rect().height))
     trains.draw(screen)
+    # Draw the user's health onto the screen
+    user_health.draw(screen)
     # pygame.draw.rect(screen, (0,0,0,25), (user_hobo.rect.x, user_hobo.rect.y, user_hobo.rect.height, user_hobo.rect.width))
     pygame.display.update()
 
@@ -218,6 +222,7 @@ while not finish:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finish = True
+            quit_induced = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP or event.key == ord('w'):
                 user_sprites.update(1, 12.5)
@@ -226,13 +231,14 @@ while not finish:
                 user_sprites.update(-1, 12.5)
                 print("y: " + str(user_hobo.rect.y));
     render()
-    
     clock.tick(fps)
-
     if (game_over):
         finish = True
-# Render Final Frame and wait x seconds before exiting
-render()
-time.sleep(10)
+
+# Render Final Frame and wait x seconds before exiting (enough time for sfx to play)
+# To quit normally on a ctrl-c in terminal or x if windowed
+if not quit_induced:
+    render()
+    pygame.time.wait(9000)
 pygame.quit()
 quit()
