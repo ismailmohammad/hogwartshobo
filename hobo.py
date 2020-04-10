@@ -6,11 +6,12 @@ import os
 pygame.init()
 screen_width = 1295
 screen_height = 800
-fps = 150
+fps = 120
 
 finish = False
 quit_induced = False
 game_over = False
+game_start = False
 
 # IMPORTANT: Uncomment one or the other for debug purposes, not a lot of screen switching, debug use w/o FS
 
@@ -27,8 +28,8 @@ HOBO_Y = TRAIN_POSITIONS[0]
 HOBO_X = 1100
 HOBO_SPEED = 13
 # reimplement plnae/train speed  later to change things up randomize
-TRAIN_SPEED = 4
-PLANE_SPEED = 3
+TRAIN_SPEED = 2
+PLANE_SPEED = 1
 MAX_HEALTH = 100
 NUMBER_HEARTS = 4
 
@@ -36,8 +37,10 @@ NUMBER_HEARTS = 4
 BLACK = (0,0,0)
 WHITE = (255,255,255)
 
+# Set up splash screen
+splash_screen = pygame.image.load('images/splash.png').convert_alpha()
 # Set up background image - 1295 x 620 px
-backgroundImage = pygame.image.load('images/background.png').convert_alpha()
+background_image = pygame.image.load('images/background.png').convert_alpha()
 
 # Create Sprite group for the user's char
 user_sprites = pygame.sprite.Group()
@@ -241,7 +244,7 @@ def addSprites():
     heart_number = 0
     heart_size = 50
     while heart_number < NUMBER_HEARTS:
-        heart = Heart(0 + (heart_number * heart_size), backgroundImage.get_rect().height + 5, heart_size)
+        heart = Heart(0 + (heart_number * heart_size), background_image.get_rect().height + 5, heart_size)
         user_health.add(heart)
         hearts.append(heart)
         heart_number += 1
@@ -261,11 +264,11 @@ def addSprites():
 def render(hobo_moving = False):
     # Render Sequence: fill black -> bg -> user hobo -> trains -> health
     screen.fill(0)
-    screen.blit(backgroundImage, (0, 0))
+    screen.blit(background_image, (0, 0))
     user_sprites.update(0, 0)
     user_sprites.draw(screen)
     if game_over:
-        screen.blit(game_over_img, (screen.get_rect().centerx - (game_over_img.get_rect().width/2), backgroundImage.get_rect().height))
+        screen.blit(game_over_img, (screen.get_rect().centerx - (game_over_img.get_rect().width/2), background_image.get_rect().height))
     if not hobo_moving and (not game_over):
         trains.update()
     # Draw trains
@@ -282,10 +285,26 @@ def render(hobo_moving = False):
 
 # Add the sprites into their respective groups then start
 addSprites()
-# Introduce a slight waiting period to ensure load/switch to fullscreen
-pygame.time.delay(100)
 
-while not finish:
+# Show Splash screen
+while not game_start:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: 
+            pygame.quit()
+            quit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q or event.key == ord('q'):
+                pygame.quit()
+                quit()
+            if event.key == pygame.K_m or event.key == ord('m'):
+                game_start = True
+        screen.fill(0)
+        screen.blit(splash_screen, (0, 0))
+        pygame.display.update()
+        clock.tick(fps)
+    
+# Start Game
+while not finish and game_start:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finish = True
