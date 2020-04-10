@@ -6,7 +6,7 @@ import os
 pygame.init()
 screen_width = 1295
 screen_height = 800
-fps = 360
+fps = 150
 
 finish = False
 quit_induced = False
@@ -14,8 +14,8 @@ game_over = False
 
 # IMPORTANT: Uncomment one or the other for debug purposes, not a lot of screen switching, debug use w/o FS
 
-# screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
-screen=pygame.display.set_mode((screen_width, screen_height))
+screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
+# screen=pygame.display.set_mode((screen_width, screen_height))
 
 pygame.display.set_caption('Hogwarts Hobo')
 
@@ -27,8 +27,8 @@ HOBO_Y = TRAIN_POSITIONS[0]
 HOBO_X = 1100
 HOBO_SPEED = 13
 # reimplement plnae/train speed  later to change things up randomize
-TRAIN_SPEED = 5
-PLANE_SPEED = 4
+TRAIN_SPEED = 4
+PLANE_SPEED = 3
 MAX_HEALTH = 100
 NUMBER_HEARTS = 4
 
@@ -37,7 +37,7 @@ BLACK = (0,0,0)
 WHITE = (255,255,255)
 
 # Set up background image - 1295 x 620 px
-backgroundImage = pygame.image.load('images/background.png')
+backgroundImage = pygame.image.load('images/background.png').convert_alpha()
 
 # Create Sprite group for the user's char
 user_sprites = pygame.sprite.Group()
@@ -64,7 +64,7 @@ pygame.mixer.music.play(-1,0.0)
 damage_sound_effect = pygame.mixer.Sound('media/not_the_roblox_death_sound.wav')
 # Game over music
 gameover_sfx = 'media/game_over.mp3'
-game_over_img = pygame.image.load('images/game_over.png')
+game_over_img = pygame.image.load('images/game_over.png').convert_alpha()
 
 class Message(pygame.sprite.Sprite):
     def __init__(self, y_pos, time, text, x_pos = "center"):
@@ -99,7 +99,7 @@ class Message(pygame.sprite.Sprite):
 class PaperPlane(pygame.sprite.Sprite):
     def __init__(self, x_pos, y_pos, speed, size, train):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('images/paperplane.png')
+        self.image = pygame.image.load('images/paperplane.png').convert_alpha()
         # resize the image to the desired size as indicated
         self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect()
@@ -122,7 +122,7 @@ class PaperPlane(pygame.sprite.Sprite):
 class Heart(pygame.sprite.Sprite):
     def __init__(self, x_pos, y_pos, size):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('images/heart.png')
+        self.image = pygame.image.load('images/heart.png').convert_alpha()
         # resize the image to the desired size as indicated
         self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect()
@@ -258,7 +258,7 @@ def addSprites():
     planes.add(PaperPlane(0, TRAIN_POSITIONS[2], PLANE_SPEED + (3 * 0.5), 60, 3))
   
 
-def render(hoboMoving = False):
+def render(hobo_moving = False):
     # Render Sequence: fill black -> bg -> user hobo -> trains -> health
     screen.fill(0)
     screen.blit(backgroundImage, (0, 0))
@@ -266,7 +266,8 @@ def render(hoboMoving = False):
     user_sprites.draw(screen)
     if game_over:
         screen.blit(game_over_img, (screen.get_rect().centerx - (game_over_img.get_rect().width/2), backgroundImage.get_rect().height))
-    trains.update()
+    if not hobo_moving and (not game_over):
+        trains.update()
     # Draw trains
     trains.draw(screen)
     # Update and draw planes
