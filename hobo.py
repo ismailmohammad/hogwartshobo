@@ -6,7 +6,7 @@ import os
 pygame.init()
 screen_width = 1295
 screen_height = 800
-fps = 60
+fps = 30
 
 finish = False
 quit_induced = False
@@ -43,8 +43,7 @@ user_health = pygame.sprite.Group()
 # Used because the sprites in group are hashed, simplicity sake
 hearts = []
 
-# Load the train image and create sprite 
-train = pygame.image.load('images/train.png')
+# Create trains sprite group
 trains = pygame.sprite.Group()
 
 # Set up them music (Feel free to replace the music peeps)
@@ -70,55 +69,53 @@ class Heart(pygame.sprite.Sprite):
 
 
 class Train(pygame.sprite.Sprite):
-    def __init__(self, startX, startY, speed, direction, width, height):
+    def __init__(self, startX, startY, speed):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((width, height))
+        self.image = pygame.image.load('images/train.png').convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = startX
         self.rect.y = startY
-        self.img = train
         self.speed = speed
-        self.direction = direction  # -1 - left, 1 - right
-        self.width = width  
-        self.height = height
-        self.image = train
+        print(self.rect)
 
     # Update train position
     def update(self):
-        if (self.direction == -1):
+        collided = self.collision()
+        if collided:
+            yum = "lol"
+        else:
+            # Trains will only move towards the Hobo, hence the increase in x position
             self.rect.x += self.speed
-        elif (self.direction == 1):
-            self.rect.x -= self.speed
-
-        if (self.direction == -1 and self.rect.x - 75 > screen_width):
-            self.rect.x = -75
-        elif (self.direction == 1 and self.rect.x + 75 < 0):
-            self.rect.x = screen_width + 75
-        self.collision()
+            # Once the train reaches the end of the scene it then loops around
+            if (self.rect.x - 75 > screen_width):
+                self.rect.x = -75
 
     def collision(self):
         for hobo in user_sprites:
             if (self.rect.colliderect(hobo) and hobo.dead == False):
-                hobo.hurt()
+                hobo.hit()
+                return True
+            return False
+                
 
 class Hobo(pygame.sprite.Sprite):
     dead = False
     health = MAX_HEALTH
 
-    def __init__(self, xpos, ypos, size):
+    def __init__(self, xpos, ypos):
         pygame.sprite.Sprite.__init__(self)
         self.frame_index = 0
-        self.size = size
-        self.hurt_image = pygame.image.load('images/sprite_hurt.png').convert_alpha()
+        self.hurt_image = pygame.image.load('images/sprite_hurt.png').subsurface((8,5,55,77)).convert_alpha()
         self.images = []
         # Load all the sprite images into the image array
         for index in range(9):
             sprite_frame = pygame.image.load(os.path.join('images','sprite_' + str(index) + '.png')).convert_alpha()
-            sprite_frame.set_colorkey(0)
-            sprite_frame.set_alpha(0)
+            # simply get a subframe and use that as the sprite (constraining the hitbox of the hobo to closer to body)
+            sprite_frame = sprite_frame.subsurface((0,5,55,77))
             self.images.append(sprite_frame)
         # Select the default sprite img
         self.image = self.images[self.frame_index]
+        # self.image = self.hurt_image
         self.rect = self.image.get_rect()
         self.rect.x = xpos
         self.rect.y = ypos
@@ -127,27 +124,24 @@ class Hobo(pygame.sprite.Sprite):
     def update(self, direction, speed):
         # direction being 1 for up and -1 for down
         if (direction == 1 and self.rect.y > TRAIN_POSITIONS[0]):
-            self.frame_index = 0
-            for frame in self.images:
-                self.changeSpriteFrame()
-                self.rect.y -= 6
-                render()
-                self.rect.y -= 7
-                render(True)
-            # go down
+            self.animateMovement(speed) # Go down a track
         elif (direction == -1 and self.rect.y < TRAIN_POSITIONS[2]):
-            self.frame_index = 0
-            moved = 0
-            for frame in self.images:
-                self.changeSpriteFrame()
-                self.rect.y += 6
-                moved += 6
-                render()
-                self.rect.y += 7
-                moved += 7
-                render(True)
-            print("moved down: " + str(moved))
-                
+            self.animateMovement(speed, False) # Go up a track
+
+    def animateMovement(self, step, up=True):
+        self.frame_index = 0
+        for frame in self.images:
+            self.changeSpriteFrame()
+            if up:
+                self.rect.y -= step/2
+            else:
+                self.rect.y += step/2
+            render()
+            if up:
+                self.rect.y -= step - (step/2)
+            else:
+                self.rect.y += step - (step/2)
+            render(True)
 
     def changeSpriteFrame(self):
         self.frame_index += 1
@@ -156,10 +150,13 @@ class Hobo(pygame.sprite.Sprite):
         self.image = self.images[self.frame_index]
         
 
-    def hurt(self):
+    def hit(self):
         self.health -= 1
-        # self.updateHealth()
+        self.image = self.hurt_image
+        self.image.set_colorkey(0)
+        self.image.set_alpha(100)
         damage_sound_effect.play()
+        # Kill/Remove the heart at the end of health indicator based on health intervals
         if (self.health in [0,25,50,75]):
             hearts[len(user_health.sprites()) - 1].kill()
         if self.health == 0:
@@ -177,29 +174,26 @@ class Hobo(pygame.sprite.Sprite):
 def addSprites():
     # Create the user's hobo and add it to the Sprite group of user controlled sprites
     global user_hobo
-    user_hobo = Hobo(1000,INITIAL_Y,50)
+    user_hobo = Hobo(1000,INITIAL_Y)
     user_sprites.add(user_hobo)
     # Populate the user's health indicator
     heart_number = 0
     heart_size = 50
-    while heart_number < 4:
+    while heart_number < NUMBER_HEARTS:
         heart = Heart(0 + (heart_number * heart_size), backgroundImage.get_rect().height + 5, heart_size)
         user_health.add(heart)
         hearts.append(heart)
         heart_number += 1
-    # set the width and height of the trains
-    (width, height) = (100, 50)
     # Create 3 trains (randomize frequency and speeed later)
-    # (x, y,speed, direction, width, height)
-    trains.add(Train(50 + 150 * (12 - 1), TRAIN_POSITIONS[0], TRAIN_SPEED, -1, width, height))
-    trains.add(Train(50 + 150 * (12 - 2 * 5), TRAIN_POSITIONS[1] , TRAIN_SPEED + 1, -1, width, height))
-    trains.add(Train(50 + 150 * (12 - 3 * 5), TRAIN_POSITIONS[2], TRAIN_SPEED + 2, -1, width, height))
+    # (xpos, ypos,speed)
+    trains.add(Train(50 + 150 * (12 - 1), TRAIN_POSITIONS[0], TRAIN_SPEED))
+    trains.add(Train(50 + 150 * (12 - 2 * 5), TRAIN_POSITIONS[1] , TRAIN_SPEED + 1))
+    trains.add(Train(50 + 150 * (12 - 3 * 5), TRAIN_POSITIONS[2], TRAIN_SPEED + 2))
 
 def render(hoboMoving = False):
-    # Render Sequence: fill black -> bg -> hobo -> trains -> health
+    # Render Sequence: fill black -> bg -> user hobo -> trains -> health
     screen.fill(0)
     screen.blit(backgroundImage, (0, 0))
-    # pygame.draw.rect(screen, colors[color_index], (x, y, 70, 70))
     user_sprites.update(0, 0)
     user_sprites.draw(screen)
     if (not hoboMoving) and (not game_over):
@@ -209,14 +203,13 @@ def render(hoboMoving = False):
     trains.draw(screen)
     # Draw the user's health onto the screen
     user_health.draw(screen)
-    # pygame.draw.rect(screen, (0,0,0,25), (user_hobo.rect.x, user_hobo.rect.y, user_hobo.rect.height, user_hobo.rect.width))
     pygame.display.update()
-
-    # screen.fill((0,0,0))
 
 
 # Add the sprites into their respective groups then start
 addSprites()
+# Introduce a slight waiting period to ensure load/switch to fullscreen
+pygame.time.delay(100)
 
 while not finish:
     for event in pygame.event.get():
@@ -225,10 +218,10 @@ while not finish:
             quit_induced = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP or event.key == ord('w'):
-                user_sprites.update(1, 12.5)
+                user_sprites.update(1, HOBO_SPEED)
                 print("y: " + str(user_hobo.rect.y));
             if event.key == pygame.K_DOWN or event.key == ord('s'):
-                user_sprites.update(-1, 12.5)
+                user_sprites.update(-1, HOBO_SPEED)
                 print("y: " + str(user_hobo.rect.y));
     render()
     clock.tick(fps)
