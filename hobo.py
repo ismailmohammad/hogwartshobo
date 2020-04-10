@@ -6,7 +6,7 @@ import os
 pygame.init()
 screen_width = 1295
 screen_height = 800
-fps = 30
+fps = 150
 
 finish = False
 quit_induced = False
@@ -23,16 +23,21 @@ clock = pygame.time.Clock()
 
 # Steps of 117 ie. divisible by 9 sprite frames
 TRAIN_POSITIONS = [270, 387, 504]
-INITIAL_Y = TRAIN_POSITIONS[0]
-INITIAL_X = 200
+HOBO_Y = TRAIN_POSITIONS[0]
+HOBO_X = 1100
 HOBO_SPEED = 13
-# reimplement later to change things up
-TRAIN_SPEED = 5
+# reimplement plnae/train speed  later to change things up randomize
+TRAIN_SPEED = 4
+PLANE_SPEED = 3
 MAX_HEALTH = 100
 NUMBER_HEARTS = 4
 
+# Colors
+BLACK = (0,0,0)
+WHITE = (255,255,255)
+
 # Set up background image - 1295 x 620 px
-backgroundImage = pygame.image.load('images/background.png')
+backgroundImage = pygame.image.load('images/background.png').convert_alpha()
 
 # Create Sprite group for the user's char
 user_sprites = pygame.sprite.Group()
@@ -46,6 +51,12 @@ hearts = []
 # Create trains sprite group
 trains = pygame.sprite.Group()
 
+# Create planes sprite group
+planes = pygame.sprite.Group()
+
+# Create messages sprite
+messages = pygame.sprite.Group()
+
 # Set up them music (Feel free to replace the music peeps)
 pygame.mixer.music.load('media/bg_music.mp3') 
 pygame.mixer.music.play(-1,0.0)
@@ -53,19 +64,70 @@ pygame.mixer.music.play(-1,0.0)
 damage_sound_effect = pygame.mixer.Sound('media/not_the_roblox_death_sound.wav')
 # Game over music
 gameover_sfx = 'media/game_over.mp3'
-game_over_img = pygame.image.load('images/game_over.png')
+game_over_img = pygame.image.load('images/game_over.png').convert_alpha()
 
-
-class Heart(pygame.sprite.Sprite):
-
-    def __init__(self, xpos, ypos, size):
+class Message(pygame.sprite.Sprite):
+    def __init__(self, y_pos, time, text, x_pos = "center"):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('images/heart.png')
+        self.image = pygame.image.load('images/scroll.png').convert_alpha()
+        self.rect = self.image.get_rect()
+        if x_pos == "center":
+            self.rect.x = screen.get_rect().centerx - (self.rect.width/1.9)
+        else:
+            self.rect.x = x_pos
+        self.rect.y = y_pos
+        self.display_time = time
+        self.start = pygame.time.get_ticks()
+        self.text = text
+
+    def update(self):
+        # Only display if time hasn't passed
+        if not (pygame.time.get_ticks() - self.start) >= self.display_time:
+            self.renderText()
+
+    def renderText(self):
+        screen.blit(self.image, self.rect)
+        font_size = 68
+        font = pygame.font.Font('fonts/mystic.ttf', font_size) # default pygame font
+        render_surface = font.render(self.text, True, BLACK)
+        render_rect = render_surface.get_rect()
+        render_rect.center = self.rect.center
+        screen.blit(render_surface, render_rect)
+
+
+
+class PaperPlane(pygame.sprite.Sprite):
+    def __init__(self, x_pos, y_pos, speed, size, train):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('images/paperplane.png').convert_alpha()
         # resize the image to the desired size as indicated
         self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect()
-        self.rect.x = xpos
-        self.rect.y = ypos
+        self.rect.x = x_pos
+        self.rect.y = y_pos
+        self.speed = speed
+        self.train = train
+
+    def update(self):
+        self.rect.x += self.speed
+        # Once the planereaches the Hobo.
+        if (self.rect.x == HOBO_X):
+            # Display the message
+            messages.add(Message(0, 600, "Train on " + str(self.train)))
+            # Kill the sprite, the plane is discarded. Though no one should litter.
+            # The paper is recycled.
+            self.kill()
+
+
+class Heart(pygame.sprite.Sprite):
+    def __init__(self, x_pos, y_pos, size):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('images/heart.png').convert_alpha()
+        # resize the image to the desired size as indicated
+        self.image = pygame.transform.scale(self.image, (size, size))
+        self.rect = self.image.get_rect()
+        self.rect.x = x_pos
+        self.rect.y = y_pos
 
 
 class Train(pygame.sprite.Sprite):
@@ -76,7 +138,6 @@ class Train(pygame.sprite.Sprite):
         self.rect.x = startX
         self.rect.y = startY
         self.speed = speed
-        print(self.rect)
 
     # Update train position
     def update(self):
@@ -87,8 +148,9 @@ class Train(pygame.sprite.Sprite):
             # Trains will only move towards the Hobo, hence the increase in x position
             self.rect.x += self.speed
             # Once the train reaches the end of the scene it then loops around
-            if (self.rect.x - 75 > screen_width):
-                self.rect.x = -75
+            # CHANGE TO KILL ONCE RANDOMIZED GENERATION COMPLETED.
+            if (self.rect.x - self.rect.width > screen_width):
+                self.rect.x = -self.rect.width
 
     def collision(self):
         for hobo in user_sprites:
@@ -102,7 +164,7 @@ class Hobo(pygame.sprite.Sprite):
     dead = False
     health = MAX_HEALTH
 
-    def __init__(self, xpos, ypos):
+    def __init__(self, x_pos, y_pos):
         pygame.sprite.Sprite.__init__(self)
         self.frame_index = 0
         self.hurt_image = pygame.image.load('images/sprite_hurt.png').subsurface((8,5,55,77)).convert_alpha()
@@ -117,8 +179,8 @@ class Hobo(pygame.sprite.Sprite):
         self.image = self.images[self.frame_index]
         # self.image = self.hurt_image
         self.rect = self.image.get_rect()
-        self.rect.x = xpos
-        self.rect.y = ypos
+        self.rect.x = x_pos
+        self.rect.y = y_pos
 
     # Update hobo position based on key presses
     def update(self, direction, speed):
@@ -141,7 +203,7 @@ class Hobo(pygame.sprite.Sprite):
                 self.rect.y -= step - (step/2)
             else:
                 self.rect.y += step - (step/2)
-            render(True)
+            render()
 
     def changeSpriteFrame(self):
         self.frame_index += 1
@@ -168,13 +230,12 @@ class Hobo(pygame.sprite.Sprite):
             # Play game over sfx
             pygame.mixer.music.load(gameover_sfx) 
             pygame.mixer.music.play()
-
         print("HObo Health: " + str(self.health))
 
 def addSprites():
     # Create the user's hobo and add it to the Sprite group of user controlled sprites
     global user_hobo
-    user_hobo = Hobo(1000,INITIAL_Y)
+    user_hobo = Hobo(HOBO_X,HOBO_Y)
     user_sprites.add(user_hobo)
     # Populate the user's health indicator
     heart_number = 0
@@ -185,22 +246,35 @@ def addSprites():
         hearts.append(heart)
         heart_number += 1
     # Create 3 trains (randomize frequency and speeed later)
-    # (xpos, ypos,speed)
+    # (x_pos, y_pos,speed)
     trains.add(Train(50 + 150 * (12 - 1), TRAIN_POSITIONS[0], TRAIN_SPEED))
     trains.add(Train(50 + 150 * (12 - 2 * 5), TRAIN_POSITIONS[1] , TRAIN_SPEED + 1))
     trains.add(Train(50 + 150 * (12 - 3 * 5), TRAIN_POSITIONS[2], TRAIN_SPEED + 2))
+    # Create a sample paper plane: to be generated randdomly via Poisson process soon
+    # Create 3 one on each track for debug
+    # (x_pos, y_pos (track), speed, size, tracknum)
+    planes.add(PaperPlane(0, TRAIN_POSITIONS[0], PLANE_SPEED + (1 * 0.5), 60, 1))
+    planes.add(PaperPlane(0, TRAIN_POSITIONS[1], PLANE_SPEED + (2 * 0.5), 60, 2))
+    planes.add(PaperPlane(0, TRAIN_POSITIONS[2], PLANE_SPEED + (3 * 0.5), 60, 3))
+  
 
-def render(hoboMoving = False):
+def render(hobo_moving = False):
     # Render Sequence: fill black -> bg -> user hobo -> trains -> health
     screen.fill(0)
     screen.blit(backgroundImage, (0, 0))
     user_sprites.update(0, 0)
     user_sprites.draw(screen)
-    if (not hoboMoving) and (not game_over):
-        trains.update()
     if game_over:
         screen.blit(game_over_img, (screen.get_rect().centerx - (game_over_img.get_rect().width/2), backgroundImage.get_rect().height))
+    if not hobo_moving and (not game_over):
+        trains.update()
+    # Draw trains
     trains.draw(screen)
+    # Update and draw planes
+    planes.update()
+    planes.draw(screen)
+    # Update and draw any messages
+    messages.update()
     # Draw the user's health onto the screen
     user_health.draw(screen)
     pygame.display.update()
@@ -217,6 +291,10 @@ while not finish:
             finish = True
             quit_induced = True
         if event.type == pygame.KEYDOWN:
+            # Press Q to quit
+            if event.key == pygame.K_q or event.key == ord('q'):
+                pygame.quit()
+                quit()
             if event.key == pygame.K_UP or event.key == ord('w'):
                 user_sprites.update(1, HOBO_SPEED)
                 print("y: " + str(user_hobo.rect.y));
