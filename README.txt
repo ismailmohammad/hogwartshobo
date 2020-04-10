@@ -1,6 +1,6 @@
 hogwartshobo
 
-Group Members: Madeed Srosh, 
+Group Members: Madeed Srosh, Nicole Fiorante, Mohammad Ismail, Ba Long Nguyen, Aadhithya Anbu Ganesan
 
 Project currently contains:
   --Agile Project Backlog
@@ -20,11 +20,11 @@ Project currently contains:
 Primary Project Backlog Editor: Madeed Srosh
 Primary Test Report Editor:
 Primary Test Plan Editor:
-Primary Source Code Developer:
+Primary Source Code Developer: Mohammad Ismail
 Results Checker(?):
 
 Additional Contributions:
-    --Additional Backlog Editors:
-    --Additional Source Code Editors:
+    --Additional Backlog Editors: Nicole Fiorante, Mohammad Ismail, Ba Long Nguyen, Aadhithya Anbu Ganesan
+    --Additional Source Code Editors: Nicole Fiorante, Mohammad Ismail, Aadhithya Anbu Ganesan, Madeed Srosh
     --Additional Test Editors:
-    --
+    --Creator of all sprites and animations: Aadhithya Anbu Ganesan
