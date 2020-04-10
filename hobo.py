@@ -6,7 +6,7 @@ import os
 pygame.init()
 screen_width = 1295
 screen_height = 800
-fps = 30
+fps = 360
 
 finish = False
 quit_induced = False
@@ -14,8 +14,8 @@ game_over = False
 
 # IMPORTANT: Uncomment one or the other for debug purposes, not a lot of screen switching, debug use w/o FS
 
-screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
-# screen=pygame.display.set_mode((screen_width, screen_height))
+# screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
+screen=pygame.display.set_mode((screen_width, screen_height))
 
 pygame.display.set_caption('Hogwarts Hobo')
 
@@ -26,8 +26,9 @@ TRAIN_POSITIONS = [270, 387, 504]
 INITIAL_Y = TRAIN_POSITIONS[0]
 INITIAL_X = 200
 HOBO_SPEED = 13
-# reimplement later to change things up
+# reimplement plnae/train speed  later to change things up randomize
 TRAIN_SPEED = 5
+PLANE_SPEED = 4
 MAX_HEALTH = 100
 NUMBER_HEARTS = 4
 
@@ -46,6 +47,9 @@ hearts = []
 # Create trains sprite group
 trains = pygame.sprite.Group()
 
+# Create planes sprite group
+planes = pygame.sprite.Group()
+
 # Set up them music (Feel free to replace the music peeps)
 pygame.mixer.music.load('media/bg_music.mp3') 
 pygame.mixer.music.play(-1,0.0)
@@ -56,8 +60,24 @@ gameover_sfx = 'media/game_over.mp3'
 game_over_img = pygame.image.load('images/game_over.png')
 
 
-class Heart(pygame.sprite.Sprite):
+class PaperPlane(pygame.sprite.Sprite):
+    def __init__(self, xpos, ypos, speed, size):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('images/paperplane.png')
+        # resize the image to the desired size as indicated
+        self.image = pygame.transform.scale(self.image, (size, size))
+        self.rect = self.image.get_rect()
+        self.rect.x = xpos
+        self.rect.y = ypos
+        self.speed = speed
 
+    def update(self):
+        self.rect.x += self.speed
+        if (self.rect.x - self.rect.width+100 > screen_width):
+            self.kill()
+
+
+class Heart(pygame.sprite.Sprite):
     def __init__(self, xpos, ypos, size):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load('images/heart.png')
@@ -76,7 +96,6 @@ class Train(pygame.sprite.Sprite):
         self.rect.x = startX
         self.rect.y = startY
         self.speed = speed
-        print(self.rect)
 
     # Update train position
     def update(self):
@@ -87,8 +106,8 @@ class Train(pygame.sprite.Sprite):
             # Trains will only move towards the Hobo, hence the increase in x position
             self.rect.x += self.speed
             # Once the train reaches the end of the scene it then loops around
-            if (self.rect.x - 75 > screen_width):
-                self.rect.x = -75
+            if (self.rect.x - self.rect.width > screen_width):
+                self.rect.x = -self.rect.width
 
     def collision(self):
         for hobo in user_sprites:
@@ -141,7 +160,7 @@ class Hobo(pygame.sprite.Sprite):
                 self.rect.y -= step - (step/2)
             else:
                 self.rect.y += step - (step/2)
-            render(True)
+            render()
 
     def changeSpriteFrame(self):
         self.frame_index += 1
@@ -189,6 +208,11 @@ def addSprites():
     trains.add(Train(50 + 150 * (12 - 1), TRAIN_POSITIONS[0], TRAIN_SPEED))
     trains.add(Train(50 + 150 * (12 - 2 * 5), TRAIN_POSITIONS[1] , TRAIN_SPEED + 1))
     trains.add(Train(50 + 150 * (12 - 3 * 5), TRAIN_POSITIONS[2], TRAIN_SPEED + 2))
+    # Create a sample paper plane: to be generated randdomly via Poisson process soon
+    # Create 3 one on each track for debug
+    for i in range(3):
+        plane = PaperPlane(0, TRAIN_POSITIONS[i], PLANE_SPEED + i, 60)
+        planes.add(plane)
 
 def render(hoboMoving = False):
     # Render Sequence: fill black -> bg -> user hobo -> trains -> health
@@ -196,11 +220,14 @@ def render(hoboMoving = False):
     screen.blit(backgroundImage, (0, 0))
     user_sprites.update(0, 0)
     user_sprites.draw(screen)
-    if (not hoboMoving) and (not game_over):
-        trains.update()
     if game_over:
         screen.blit(game_over_img, (screen.get_rect().centerx - (game_over_img.get_rect().width/2), backgroundImage.get_rect().height))
+    trains.update()
+    # Draw trains
     trains.draw(screen)
+    # Update and draw planes
+    planes.update()
+    planes.draw(screen)
     # Draw the user's health onto the screen
     user_health.draw(screen)
     pygame.display.update()
