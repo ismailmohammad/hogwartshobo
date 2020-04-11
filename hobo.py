@@ -16,6 +16,8 @@ def game(test_mode = False, number_hobos = 1):
     game_over = False
     game_start = False
     automated = False
+
+    hobo_num = number_hobos
     
     if not test_mode:
         var_prompt = raw_input("Do you want to input certain variables? Type y or Y to continue: \n")
@@ -420,10 +422,8 @@ def game(test_mode = False, number_hobos = 1):
                 if not automated:
                     if event.key == pygame.K_UP or event.key == ord('w'):
                         user_sprites.update(1, HOBO_SPEED)
-                        print("y: " + str(user_hobo.rect.y));
                     if event.key == pygame.K_DOWN or event.key == ord('s'):
                         user_sprites.update(-1, HOBO_SPEED)
-                        print("y: " + str(user_hobo.rect.y));
         if (len(user_sprites) == 0 and len(other_hobos) == 0):
             game_over = True
             print("Game Over, all the hobos are deceased.")
