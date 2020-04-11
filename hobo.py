@@ -15,6 +15,21 @@ game_over = False
 game_start = False
 automated = False
 
+hobo_num = 3
+
+var_prompt = raw_input("Do you want to input certain variables? Type y or Y to continue: \n")
+if (var_prompt == "y" or var_prompt == "Y"):
+    print("""
+    Tracks at this time will not be user selectable (however can be easily expanded to render more
+    tracks and simply expand the TRAIN positions to M tracks and loop and increment each by
+    the frame step in this case 117 px)
+    """)
+    hobo_num = raw_input("How many other hobos at the exit, aside from yourself? (whole numbers only 0 to x): \n")
+    try:
+        hobo_num = int(hobo_num)
+    except:
+        print("Error: Please enter Whole numbers 0 and greater only.")
+
 # IMPORTANT: Uncomment one or the other for debug purposes, not a lot of screen switching, debug use w/o FS
 
 # screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
@@ -36,6 +51,9 @@ MAX_HEALTH = 100
 NUMBER_HEARTS = 4
 # Number of opponents/other hobos
 NUMBER_HOBOS = 3
+# Reassign hobo number if input was valid
+if type(hobo_num) == int:
+    NUMBER_HOBOS = hobo_num
 
 # Colors
 BLACK = (0,0,0)
@@ -280,7 +298,10 @@ class Hobo(pygame.sprite.Sprite):
 
 
     def hit(self):
-        self.health -= 25
+        if automated:
+            self.health -= 25
+        else:
+            self.health -= 1
         self.collided = True
         self.image = self.hurt_image
         self.image.set_colorkey(0)
@@ -361,11 +382,9 @@ while not game_start:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
             pygame.quit()
-            quit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q or event.key == ord('q'):
                 pygame.quit()
-                quit()
             if event.key == pygame.K_m or event.key == ord('m'):
                 game_start = True
             if event.key == pygame.K_a or event.key == ord('a'):
@@ -387,7 +406,7 @@ while not finish and game_start:
             # Press Q to quit
             if event.key == pygame.K_q or event.key == ord('q'):
                 pygame.quit()
-                quit()
+                
             if not automated:
                 if event.key == pygame.K_UP or event.key == ord('w'):
                     user_sprites.update(1, HOBO_SPEED)
@@ -395,7 +414,6 @@ while not finish and game_start:
                 if event.key == pygame.K_DOWN or event.key == ord('s'):
                     user_sprites.update(-1, HOBO_SPEED)
                     print("y: " + str(user_hobo.rect.y));
-    global game_over
     if (len(user_sprites) == 0 and len(other_hobos) == 0):
         game_over = True
         print("game over, all hobo died lol")
@@ -413,4 +431,3 @@ if not quit_induced:
     pygame.mixer.music.play()
     pygame.time.wait(9000)
 pygame.quit()
-quit()
