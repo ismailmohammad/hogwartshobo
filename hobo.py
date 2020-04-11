@@ -18,7 +18,11 @@ game_start = False
 automated = False
 test_mode = False
 unittest = False
+fullscreen = ""
 hobo_num = 1
+
+def displayUsage():
+    print("Usage: python hobo.py b(required for test mode) #hobos(optional after b)")
 
 args = len(sys.argv)
 if (args > 1):
@@ -29,10 +33,12 @@ if (args > 1):
                 hobo_num = int(sys.argv[2])
             except:
                 print("Error: Please enter Whole numbers 0 and greater only.")
+                displayUsage()
                 pygame.quit()
                 sys.exit()
         
 if not test_mode:
+    fullscreen = raw_input("Enter fullscreen? Type f or F, else defaulting to windowed. Enter to continue: \n")
     var_prompt = raw_input("Do you want to input certain variables? Type y or Y to continue: \n")
     if (var_prompt == "y" or var_prompt == "Y"):
         print("""
@@ -48,8 +54,10 @@ if not test_mode:
 
 # IMPORTANT: Uncomment one or the other for debug purposes, not a lot of screen switching, debug use w/o FS
 
-# screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
-screen=pygame.display.set_mode((screen_width, screen_height))
+if (fullscreen == "f" or fullscreen == "F"):
+    screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
+else:
+    screen=pygame.display.set_mode((screen_width, screen_height))
 
 pygame.display.set_caption('Hogwarts Hobo')
 
@@ -116,7 +124,7 @@ gameover_sfx = 'media/game_over.mp3'
 game_over_img = pygame.image.load('images/game_over.png').convert_alpha()
 
 class Message(pygame.sprite.Sprite):
-    def __init__(self, y_pos, time, text, x_pos = "center"):
+    def __init__(self, y_pos, time, text, train, x_pos = "center"):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load('images/scroll.png').convert_alpha()
         self.rect = self.image.get_rect()
@@ -128,11 +136,18 @@ class Message(pygame.sprite.Sprite):
         self.display_time = time
         self.start = pygame.time.get_ticks()
         self.text = text
+        self.train = train
+        message_list.append(self)
 
     def update(self):
         # Only display if time hasn't passed
         if not (pygame.time.get_ticks() - self.start) >= self.display_time:
             self.renderText()
+        elif (pygame.time.get_ticks() - self.start) >= self.display_time:
+            try:
+                message_list.remove(self)
+            except:
+                dead = True
 
     def renderText(self):
         screen.blit(self.image, self.rect)
@@ -162,7 +177,14 @@ class PaperPlane(pygame.sprite.Sprite):
         # Once the planereaches the Hobo.
         if (self.rect.x == HOBO_X):
             # Display the message
-            messages.add(Message(0, 600, "Train on " + str(self.train)))
+            messages.add(Message(0, 600, "Train on " + str(self.train), self.train))
+            if automated:   
+                for hobo in user_sprites:
+                    if (self.rect.colliderect(hobo) and hobo.dead == False and not hobo.switching):
+                        hobo.checkMessages()
+                for other_hobo in other_hobos:
+                    if (self.rect.colliderect(other_hobo) and other_hobo.dead == False and not other_hobo.switching):
+                        other_hobo.checkMessages()
             # Kill the sprite, the plane is discarded. Though no one should litter.
             # The paper is recycled.
             self.kill()
@@ -317,6 +339,13 @@ class Hobo(pygame.sprite.Sprite):
             while self.rect.y != destination:
                 self.update(-1, HOBO_SPEED)
         self.switching = False
+
+    def checkMessages(self):
+        for message in message_list:
+            if (message.train -1) == self.getCurrentTrack():
+                print("switching because message on track " + str(message.train))
+                print("I am on track " + str(self.getCurrentTrack()))
+                self.switchTrack()
 
 
     def hit(self):
