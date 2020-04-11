@@ -15,6 +15,17 @@ game_over = False
 game_start = False
 automated = False
 
+var_prompt = raw_input("Do you want to input certain variables? Type y or Y to continue: \n")
+if (var_prompt == "y" or var_prompt == "Y"):
+    # Tracks at this time will not be user selectable (however can be easily expanded to render more
+    # tracks and simply expand the TRAIN positions to M tracks and loop and increment each by the frame
+    # step in this case 117 pixels
+    hobo_num = raw_input("How many hobos at the exit? (whole numbers only 0 to x)")
+    try:
+        hobo_num = int(hobo_num)
+    except:
+        print("Error: Please enter Whole numbers 0 and greater only.")
+
 # IMPORTANT: Uncomment one or the other for debug purposes, not a lot of screen switching, debug use w/o FS
 
 # screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
@@ -36,6 +47,9 @@ MAX_HEALTH = 100
 NUMBER_HEARTS = 4
 # Number of opponents/other hobos
 NUMBER_HOBOS = 3
+# Reassign hobo number if input was valid
+if type(hobo_num) == int:
+    NUMBER_HOBOS = hobo_num
 
 # Colors
 BLACK = (0,0,0)
