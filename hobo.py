@@ -298,7 +298,10 @@ class Hobo(pygame.sprite.Sprite):
 
 
     def hit(self):
-        self.health -= 25
+        if automated:
+            self.health -= 25
+        else:
+            self.health -= 1
         self.collided = True
         self.image = self.hurt_image
         self.image.set_colorkey(0)
@@ -379,11 +382,9 @@ while not game_start:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: 
             pygame.quit()
-            quit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_q or event.key == ord('q'):
                 pygame.quit()
-                quit()
             if event.key == pygame.K_m or event.key == ord('m'):
                 game_start = True
             if event.key == pygame.K_a or event.key == ord('a'):
@@ -405,7 +406,7 @@ while not finish and game_start:
             # Press Q to quit
             if event.key == pygame.K_q or event.key == ord('q'):
                 pygame.quit()
-                quit()
+                
             if not automated:
                 if event.key == pygame.K_UP or event.key == ord('w'):
                     user_sprites.update(1, HOBO_SPEED)
@@ -430,4 +431,3 @@ if not quit_induced:
     pygame.mixer.music.play()
     pygame.time.wait(9000)
 pygame.quit()
-quit()
