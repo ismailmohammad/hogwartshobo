@@ -36,5 +36,5 @@ Creator of sprites and animations: Aadhithya Anbu Ganesan
 
 Additional Contributions:
     --Additional Backlog Editors: Nicole Fiorante, Mohammad Ismail, Ba Long Nguyen, Aadhithya Anbu Ganesan
-    --Additional Source Code Editors: Nicole Fiorante, Mohammad Ismail, Aadhithya Anbu Ganesan, Madeed Srosh
+    --Additional Source Code Editors: Nicole Fiorante, Mohammad Ismail, Aadhithya Anbu Ganesan, Madeed Srosh, Ba Long Nguyen
     --Additional Test Editors: Mohammad Ismail, Aadhithya Anbu Ganesan, Madeed Srosh
