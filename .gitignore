@@ -1,1 +1,6 @@
 build/*
+build/hobo/*
+build/hobo/EXE-00.toc
+build/hobo/hobo.exe
+build/hobo/PKG-00.pkg
+build/hobo/xref-hobo.html
