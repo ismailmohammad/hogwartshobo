@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import time
 import os
+import random
 
 pygame.init()
 screen_width = 1295
@@ -12,11 +13,12 @@ finish = False
 quit_induced = False
 game_over = False
 game_start = False
+automated = False
 
 # IMPORTANT: Uncomment one or the other for debug purposes, not a lot of screen switching, debug use w/o FS
 
-screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
-# screen=pygame.display.set_mode((screen_width, screen_height))
+# screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
+screen=pygame.display.set_mode((screen_width, screen_height))
 
 pygame.display.set_caption('Hogwarts Hobo')
 
@@ -59,6 +61,8 @@ planes = pygame.sprite.Group()
 
 # Create messages sprite
 messages = pygame.sprite.Group()
+# Used to keep track of messages in order as they present themselves since the Group is hashed instead
+message_list = []
 
 # Set up them music (Feel free to replace the music peeps)
 pygame.mixer.music.load('media/bg_music.mp3') 
@@ -184,6 +188,7 @@ class Hobo(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x_pos
         self.rect.y = y_pos
+        self.collided = False
 
     # Update hobo position based on key presses
     def update(self, direction, speed):
@@ -213,14 +218,55 @@ class Hobo(pygame.sprite.Sprite):
         if self.frame_index == len(self.images):
             self.frame_index = 0
         self.image = self.images[self.frame_index]
-        
+
+    """
+    Gets the current track index of the Hobo, used to determine which tracks
+    can be switched to, regardless of if they are occupied or not
+    """
+    def getCurrentTrack(self):
+        try:
+            position = TRAIN_POSITIONS.index(self.rect.y)
+        except:
+            position = None
+        return position
+
+    def chooseTrack(self):
+        # Switch Tracks if collided/hit
+        # Get current track
+        current_track = self.getCurrentTrack()
+        if current_track == None:
+            return current_track
+        # Instead of making it random track, change it soon to be one that's not thought to be
+        # occupied
+        random_track = random.choice(TRAIN_POSITIONS)
+        # If the chosen track is the same choose another track
+        while random_track == TRAIN_POSITIONS[current_track]:
+            random_track = random.choice(TRAIN_POSITIONS)
+        return random_track
+
+    def switchTrack(self):
+        current = self.getCurrentTrack()
+        if current == None:
+            return current
+        else:
+            current = TRAIN_POSITIONS[current]
+        destination = self.chooseTrack()
+        if destination < current:
+            while self.rect.y != destination:
+                self.update(1, HOBO_SPEED)
+        else:
+            while self.rect.y != destination:
+                self.update(-1, HOBO_SPEED)
+
 
     def hit(self):
         self.health -= 1
+        self.collided = True
         self.image = self.hurt_image
         self.image.set_colorkey(0)
         self.image.set_alpha(100)
         damage_sound_effect.play()
+        self.switchTrack()
         # Kill/Remove the heart at the end of health indicator based on health intervals
         if (self.health in [0,25,50,75]):
             hearts[len(user_health.sprites()) - 1].kill()
@@ -298,6 +344,9 @@ while not game_start:
                 quit()
             if event.key == pygame.K_m or event.key == ord('m'):
                 game_start = True
+            if event.key == pygame.K_a or event.key == ord('a'):
+                game_start = True
+                automated = True
         screen.fill(0)
         screen.blit(splash_screen, (0, 0))
         pygame.display.update()
@@ -314,12 +363,13 @@ while not finish and game_start:
             if event.key == pygame.K_q or event.key == ord('q'):
                 pygame.quit()
                 quit()
-            if event.key == pygame.K_UP or event.key == ord('w'):
-                user_sprites.update(1, HOBO_SPEED)
-                print("y: " + str(user_hobo.rect.y));
-            if event.key == pygame.K_DOWN or event.key == ord('s'):
-                user_sprites.update(-1, HOBO_SPEED)
-                print("y: " + str(user_hobo.rect.y));
+            if not automated:
+                if event.key == pygame.K_UP or event.key == ord('w'):
+                    user_sprites.update(1, HOBO_SPEED)
+                    print("y: " + str(user_hobo.rect.y));
+                if event.key == pygame.K_DOWN or event.key == ord('s'):
+                    user_sprites.update(-1, HOBO_SPEED)
+                    print("y: " + str(user_hobo.rect.y));
     render()
     clock.tick(fps)
     if (game_over):
