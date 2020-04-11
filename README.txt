@@ -1,6 +1,6 @@
 hogwartshobo
 
-Group Members: Madeed Srosh, Nicole Fiorante (500790792), Mohammad Ismail, Ba Long Nguyen (500899234), Aadhithya Anbu Ganesan
+Group Members: Madeed Srosh (500837916), Nicole Fiorante (500790792), Mohammad Ismail, Ba Long Nguyen (500899234), Aadhithya Anbu Ganesan
 
 Project currently contains:
   --Agile Project Backlog
