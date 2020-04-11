@@ -25,7 +25,7 @@ Project currently contains:
   --Test Report
       --Describes incremental tests.
   --Results Report
-      --Displays final results for tests.
+      --Displays final results for tests. (Seen in source_code/tests/results_report.txt)
 
 Primary Project Backlog Editor: Madeed Srosh
 Primary Test Report Editor: Nicole Fiorante
