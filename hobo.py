@@ -286,7 +286,7 @@ class Hobo(pygame.sprite.Sprite):
         # Kill/Remove the heart at the end of health indicator based on health intervals
         if (self.health in [0,25,50,75]):
             hearts[len(user_health.sprites()) - 1].kill()
-        if self.health == 0:
+        if self.health <= 0:
             self.dead = True
             self.image = self.hurt_image
             self.kill()
@@ -326,7 +326,7 @@ def addSprites():
 
 def addOtherHobos(number_hobos):
     for hobo in range(number_hobos):
-        pc_hobo = Hobo(HOBO_X, (HOBO_Y + (117 * random.choice([0,1,2])) ), "other")
+        pc_hobo = Hobo(HOBO_X, (HOBO_Y + (117 * random.choice([1,2])) ), "other")
         other_hobos.add(pc_hobo)
   
 
