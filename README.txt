@@ -6,7 +6,7 @@ Project currently contains:
   --Agile Project Backlog
       --Contains all known requirements and progress on them
   --Source Code
-      --Contains code necissary to edit game
+      --Contains code necessary to edit game
   --README
       --Describes all parts of project completed and what remains unfinished
   --Test Plan
