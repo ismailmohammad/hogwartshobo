@@ -2,7 +2,7 @@ Hogwarts Hobo - The Game
 
 ### IMPORTANT ###
 ###
-To execute: navigate to /dist/hobo/ and then run hobo.exe either by double clicking or from powershell/command prompt
+To execute: navigate to /executable/hobo/ and then run hobo.exe either by double clicking or from powershell/command prompt
 -- To run the source code itself, please keep in mind of the requirements:
   - Windows 8 and above
   - Python2.7 is required due to changes in integer/float arithmetic operations
