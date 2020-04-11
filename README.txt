@@ -10,21 +10,21 @@ Project currently contains:
   --README
       --Describes all parts of project completed and what remains unfinished
   --Test Plan
-      --UNFINISHED
+      --Describes methods and requirements for tests
   --Test Report
-      --Describes incremental tests and results.
+      --Describes incremental tests.
   --Results Report
-      --UNFINISHED
+      --Displays final results for tests.
 
 
 Primary Project Backlog Editor: Madeed Srosh
-Primary Test Report Editor: Madeed Srosh
+Primary Test Report Editor: Nicole Fiorante
 Primary Test Plan Editor: Ba Long Nguyen
 Primary Source Code Developer: Mohammad Ismail
 Results Checker: Mohammad Ismail
+Creator of all sprites and animations: Aadhithya Anbu Ganesan
 
 Additional Contributions:
     --Additional Backlog Editors: Nicole Fiorante, Mohammad Ismail, Ba Long Nguyen, Aadhithya Anbu Ganesan
     --Additional Source Code Editors: Nicole Fiorante, Mohammad Ismail, Aadhithya Anbu Ganesan, Madeed Srosh
-    --Additional Test Editors:
-    --Creator of all sprites and animations: Aadhithya Anbu Ganesan
+    --Additional Test Editors: Mohammad Ismail, Aadhithya Anbu Ganesan, Madeed Srosh
