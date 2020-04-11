@@ -53,6 +53,9 @@ user_health = pygame.sprite.Group()
 # Used because the sprites in group are hashed, simplicity sake
 hearts = []
 
+# Group to contain other hobos
+other_hobos = pygame.sprite.Group()
+
 # Create trains sprite group
 trains = pygame.sprite.Group()
 
@@ -164,21 +167,32 @@ class Train(pygame.sprite.Sprite):
             if (self.rect.colliderect(hobo) and hobo.dead == False):
                 hobo.hit()
                 return True
-            return False
+        for other_hobo in other_hobos:
+            if (self.rect.colliderect(other_hobo) and other_hobo.dead == False):
+                other_hobo.hit()
+                return True
+        return False
                 
 
 class Hobo(pygame.sprite.Sprite):
     dead = False
     health = MAX_HEALTH
 
-    def __init__(self, x_pos, y_pos):
+    def __init__(self, x_pos, y_pos, sprite_type = "user"):
         pygame.sprite.Sprite.__init__(self)
         self.frame_index = 0
-        self.hurt_image = pygame.image.load('images/sprite_hurt.png').subsurface((8,5,55,77)).convert_alpha()
+        if sprite_type == "other":
+            self.hurt_image = pygame.image.load('images/oh_hurt.png').subsurface((8,5,55,77)).convert_alpha()
+        else:
+            self.hurt_image = pygame.image.load('images/sprite_hurt.png').subsurface((8,5,55,77)).convert_alpha()
         self.images = []
         # Load all the sprite images into the image array
+        if sprite_type == "other":
+            img_type = "oh_"
+        else:
+            img_type = "sprite_"
         for index in range(9):
-            sprite_frame = pygame.image.load(os.path.join('images','sprite_' + str(index) + '.png')).convert_alpha()
+            sprite_frame = pygame.image.load(os.path.join('images',img_type + str(index) + '.png')).convert_alpha()
             # simply get a subframe and use that as the sprite (constraining the hitbox of the hobo to closer to body)
             sprite_frame = sprite_frame.subsurface((0,5,55,77))
             self.images.append(sprite_frame)
@@ -266,19 +280,23 @@ class Hobo(pygame.sprite.Sprite):
         self.image.set_colorkey(0)
         self.image.set_alpha(100)
         damage_sound_effect.play()
-        self.switchTrack()
+        if automated:
+            pygame.event.pump()
+            self.switchTrack()
         # Kill/Remove the heart at the end of health indicator based on health intervals
         if (self.health in [0,25,50,75]):
             hearts[len(user_health.sprites()) - 1].kill()
         if self.health == 0:
             self.dead = True
             self.image = self.hurt_image
+            self.kill()
             global game_over 
-            game_over = True
-            print("game over, your hobo died lol")
-            # Play game over sfx
-            pygame.mixer.music.load(gameover_sfx) 
-            pygame.mixer.music.play()
+            if (len(user_sprites.sprites()) == 0 and len(other_hobos.sprites()) == 0):
+                game_over = True
+                print("game over, all hobo died lol")
+                # Play game over sfx
+                pygame.mixer.music.load(gameover_sfx) 
+                pygame.mixer.music.play()
         print("HObo Health: " + str(self.health))
 
 def addSprites():
@@ -305,6 +323,11 @@ def addSprites():
     planes.add(PaperPlane(0, TRAIN_POSITIONS[0], PLANE_SPEED + (1 * 0.5), 60, 1))
     planes.add(PaperPlane(0, TRAIN_POSITIONS[1], PLANE_SPEED + (2 * 0.5), 60, 2))
     planes.add(PaperPlane(0, TRAIN_POSITIONS[2], PLANE_SPEED + (3 * 0.5), 60, 3))
+
+def addOtherHobos(number_hobos):
+    for hobo in range(number_hobos):
+        pc_hobo = Hobo(HOBO_X, (HOBO_Y + (117 * random.choice([0,1,2])) ), "other")
+        other_hobos.add(pc_hobo)
   
 
 def render(hobo_moving = False):
@@ -313,6 +336,8 @@ def render(hobo_moving = False):
     screen.blit(background_image, (0, 0))
     user_sprites.update(0, 0)
     user_sprites.draw(screen)
+    other_hobos.update(0, 0)
+    other_hobos.draw(screen)
     if game_over:
         screen.blit(game_over_img, (screen.get_rect().centerx - (game_over_img.get_rect().width/2), background_image.get_rect().height))
     if not hobo_moving and (not game_over):
@@ -345,6 +370,7 @@ while not game_start:
             if event.key == pygame.K_m or event.key == ord('m'):
                 game_start = True
             if event.key == pygame.K_a or event.key == ord('a'):
+                addOtherHobos(2)
                 game_start = True
                 automated = True
         screen.fill(0)
