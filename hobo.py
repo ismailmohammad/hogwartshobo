@@ -17,8 +17,8 @@ automated = False
 
 # IMPORTANT: Uncomment one or the other for debug purposes, not a lot of screen switching, debug use w/o FS
 
-screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
-# screen=pygame.display.set_mode((screen_width, screen_height))
+# screen=pygame.display.set_mode((screen_width, screen_height), FULLSCREEN)
+screen=pygame.display.set_mode((screen_width, screen_height))
 
 pygame.display.set_caption('Hogwarts Hobo')
 
@@ -34,6 +34,8 @@ TRAIN_SPEED = 2
 PLANE_SPEED = 1
 MAX_HEALTH = 100
 NUMBER_HEARTS = 4
+# Number of opponents/other hobos
+NUMBER_HOBOS = 3
 
 # Colors
 BLACK = (0,0,0)
@@ -164,11 +166,11 @@ class Train(pygame.sprite.Sprite):
 
     def collision(self):
         for hobo in user_sprites:
-            if (self.rect.colliderect(hobo) and hobo.dead == False):
+            if (self.rect.colliderect(hobo) and hobo.dead == False and not hobo.switching):
                 hobo.hit()
                 return True
         for other_hobo in other_hobos:
-            if (self.rect.colliderect(other_hobo) and other_hobo.dead == False):
+            if (self.rect.colliderect(other_hobo) and other_hobo.dead == False and not other_hobo.switching):
                 other_hobo.hit()
                 return True
         return False
@@ -181,6 +183,7 @@ class Hobo(pygame.sprite.Sprite):
     def __init__(self, x_pos, y_pos, sprite_type = "user"):
         pygame.sprite.Sprite.__init__(self)
         self.frame_index = 0
+        self.sprite_type = sprite_type
         if sprite_type == "other":
             self.hurt_image = pygame.image.load('images/oh_hurt.png').subsurface((8,5,55,77)).convert_alpha()
         else:
@@ -203,6 +206,7 @@ class Hobo(pygame.sprite.Sprite):
         self.rect.x = x_pos
         self.rect.y = y_pos
         self.collided = False
+        self.switching = False
 
     # Update hobo position based on key presses
     def update(self, direction, speed):
@@ -260,21 +264,23 @@ class Hobo(pygame.sprite.Sprite):
 
     def switchTrack(self):
         current = self.getCurrentTrack()
-        if current == None:
-            return current
+        if current == None and not self.dead:
+            return None
         else:
             current = TRAIN_POSITIONS[current]
         destination = self.chooseTrack()
+        self.switching = True
         if destination < current:
             while self.rect.y != destination:
                 self.update(1, HOBO_SPEED)
         else:
             while self.rect.y != destination:
                 self.update(-1, HOBO_SPEED)
+        self.switching = False
 
 
     def hit(self):
-        self.health -= 1
+        self.health -= 25
         self.collided = True
         self.image = self.hurt_image
         self.image.set_colorkey(0)
@@ -284,19 +290,12 @@ class Hobo(pygame.sprite.Sprite):
             pygame.event.pump()
             self.switchTrack()
         # Kill/Remove the heart at the end of health indicator based on health intervals
-        if (self.health in [0,25,50,75]):
+        if (self.health in [0,25,50,75] and self.sprite_type != "other"):
             hearts[len(user_health.sprites()) - 1].kill()
         if self.health <= 0:
             self.dead = True
             self.image = self.hurt_image
             self.kill()
-            global game_over 
-            if (len(user_sprites.sprites()) == 0 and len(other_hobos.sprites()) == 0):
-                game_over = True
-                print("game over, all hobo died lol")
-                # Play game over sfx
-                pygame.mixer.music.load(gameover_sfx) 
-                pygame.mixer.music.play()
         print("HObo Health: " + str(self.health))
 
 def addSprites():
@@ -370,7 +369,7 @@ while not game_start:
             if event.key == pygame.K_m or event.key == ord('m'):
                 game_start = True
             if event.key == pygame.K_a or event.key == ord('a'):
-                addOtherHobos(2)
+                addOtherHobos(NUMBER_HOBOS)
                 game_start = True
                 automated = True
         screen.fill(0)
@@ -396,15 +395,22 @@ while not finish and game_start:
                 if event.key == pygame.K_DOWN or event.key == ord('s'):
                     user_sprites.update(-1, HOBO_SPEED)
                     print("y: " + str(user_hobo.rect.y));
+    global game_over
+    if (len(user_sprites) == 0 and len(other_hobos) == 0):
+        game_over = True
+        print("game over, all hobo died lol")
     render()
     clock.tick(fps)
     if (game_over):
-        finish = True
+        break
 
 # Render Final Frame and wait x seconds before exiting (enough time for sfx to play)
 # To quit normally on a ctrl-c in terminal or x if windowed
 if not quit_induced:
     render()
+    # Play game over sfx
+    pygame.mixer.music.load(gameover_sfx) 
+    pygame.mixer.music.play()
     pygame.time.wait(9000)
 pygame.quit()
 quit()
