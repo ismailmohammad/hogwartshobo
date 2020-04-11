@@ -1,0 +1,30 @@
+Number of other hobos: 0 Trials: 3  Total Trial Time: 32.4699536 Average: 10.82331787
+Number of other hobos: 0 Trials: 3  Total Trial Time: 33.1712694 Average: 11.0570898
+Number of other hobos: 0 Trials: 3  Total Trial Time: 38.837087  Average: 12.94569567
+Number of other hobos: 0 Trials: 3  Total Trial Time: 32.3437815 Average: 10.7812605   
+Number of other hobos: 0 Trials: 3  Total Trial Time: 25.4932939 Average: 8.497764633
+Number of other hobos: 0 Trials: 3  Total Trial Time: 39.5951116 Average: 13.19837053
+
+Number of other hobos: 1 Trials: 3  Total Trial Time: 45.1612853 Average: 15.05376177
+Number of other hobos: 2 Trials: 3  Total Trial Time: 43.6595166 Average: 14.5531722
+Number of other hobos: 4 Trials: 3  Total Trial Time: 44.0332777 Average: 14.67775923
+Number of other hobos: 5 Trials: 3  Total Trial Time: 47.9593988 Average: 15.98646627
+
+Number of other hobos: 0 Trials: 1  Total Trial Time: 17.4904327 Average: 17.4904327 
+Number of other hobos: 1 Trials: 1  Total Trial Time: 16.7168556 Average: 16.7168556 
+Number of other hobos: 2 Trials: 1  Total Trial Time: 17.5147341 Average: 17.5147341 
+Number of other hobos: 3 Trials: 1  Total Trial Time: 16.4394318 Average: 16.4394318 
+Number of other hobos: 4 Trials: 1  Total Trial Time: 19.0086529 Average: 19.0086529 
+Number of other hobos: 5 Trials: 1  Total Trial Time: 18.8144438 Average: 18.8144438 
+Number of other hobos: 6 Trials: 1  Total Trial Time: 13.7886546 Average: 13.7886546 
+
+Number of other hobos: 0 Trials: 5  Total Trial Time: 70.9771116 Average: 14.19542232
+Number of other hobos: 1 Trials: 5  Total Trial Time: 81.0310492 Average: 16.20620984
+
+# After implementing switching due to messages:
+
+
+Number of other hobos: 0 Trials: 3 Total Trial Time: 47.293368 Average: 15.764456
+Number of other hobos: 1 Trials: 3 Total Trial Time: 41.1880865 Average: 13.7293621667
+Number of other hobos: 2 Trials: 3 Total Trial Time: 41.5974591 Average: 13.8658197
+Number of other hobos: 3 Trials: 3 Total Trial Time: 41.7806424 Average: 13.9268808
