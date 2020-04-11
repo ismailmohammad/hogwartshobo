@@ -2,11 +2,11 @@ Hogwarts Hobo - The Game
 
 ### IMPORTANT ###
 ###
-To execute: navigate to /dist/hobo/ and then run hobo.exe either double clicking or from powershell/command prompt
+To execute: navigate to /dist/hobo/ and then run hobo.exe either by double clicking or from powershell/command prompt
 -- To run the source code itself, please keep in mind of the requirements:
   - Windows 8 and above
   - Python2.7 is required due to changes in integer/float arithmetic operations
-  - The module pygame must also by installed on the machine. (pip install pygame or pip install pygame --user)
+  - The module pygame must also be installed on the machine. (pip install pygame or pip install pygame --user)
 ###
 
 Brought to you by (Group Members): Madeed Srosh (500837916), Nicole Fiorante (500790792), Mohammad Ismail (500777447), Ba Long Nguyen (500899234), Aadhithya Anbu Ganesan (500960159)
