@@ -17,10 +17,12 @@ automated = False
 
 var_prompt = raw_input("Do you want to input certain variables? Type y or Y to continue: \n")
 if (var_prompt == "y" or var_prompt == "Y"):
-    # Tracks at this time will not be user selectable (however can be easily expanded to render more
-    # tracks and simply expand the TRAIN positions to M tracks and loop and increment each by the frame
-    # step in this case 117 pixels
-    hobo_num = raw_input("How many hobos at the exit? (whole numbers only 0 to x)")
+    print("""
+    Tracks at this time will not be user selectable (however can be easily expanded to render more
+    tracks and simply expand the TRAIN positions to M tracks and loop and increment each by
+    the frame step in this case 117 px)
+    """)
+    hobo_num = raw_input("How many other hobos at the exit, aside from yourself? (whole numbers only 0 to x): \n")
     try:
         hobo_num = int(hobo_num)
     except:
@@ -409,7 +411,6 @@ while not finish and game_start:
                 if event.key == pygame.K_DOWN or event.key == ord('s'):
                     user_sprites.update(-1, HOBO_SPEED)
                     print("y: " + str(user_hobo.rect.y));
-    global game_over
     if (len(user_sprites) == 0 and len(other_hobos) == 0):
         game_over = True
         print("game over, all hobo died lol")
