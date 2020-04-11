@@ -1,6 +1,6 @@
 Hogwarts Hobo - The Game
 
-##IMPORTANT##
+### IMPORTANT ###
 ###
 To execute: navigate to /dist/hobo/ and then run hobo.exe either double clicking or from powershell/command prompt
 -- To run the source code itself, please keep in mind of the requirements:
@@ -18,7 +18,6 @@ Project currently contains:
       --Contains code necessary to edit game
       -- To run the game, it has been freezed to maximize compatibility
       can be run whether or not python is installed on the machine. 
-
   --README
       --Describes all parts of project completed and what remains unfinished
   --Test Plan
@@ -27,7 +26,6 @@ Project currently contains:
       --Describes incremental tests.
   --Results Report
       --Displays final results for tests.
-
 
 Primary Project Backlog Editor: Madeed Srosh
 Primary Test Report Editor: Nicole Fiorante
