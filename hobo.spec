@@ -2,11 +2,16 @@
 
 block_cipher = None
 
+added_files = [
+         ( 'fonts/', 'fonts' ),
+         ( 'images/', 'images' ),
+         ( 'media/', 'media' ),
+         ]
 
 a = Analysis(['hobo.py'],
              pathex=['C:\\Users\\Lazarus\\Desktop\\hogwartshobo'],
              binaries=[],
-             datas=[],
+             datas=added_files,
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],

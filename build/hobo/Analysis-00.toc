@@ -1,4 +1,4 @@
-(['C:\\Users\\Lazarus\\Desktop\\hogwartshobo\\hobo.py'],
+(['hobo.py'],
  ['C:\\Users\\Lazarus\\Desktop\\hogwartshobo',
   'C:\\Users\\Lazarus\\Desktop\\hogwartshobo'],
  ['codecs'],

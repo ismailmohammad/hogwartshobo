@@ -15,6 +15,8 @@ game_over = False
 game_start = False
 automated = False
 
+hobo_num = 3
+
 var_prompt = raw_input("Do you want to input certain variables? Type y or Y to continue: \n")
 if (var_prompt == "y" or var_prompt == "Y"):
     print("""
