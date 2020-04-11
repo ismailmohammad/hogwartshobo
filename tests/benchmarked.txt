@@ -1,0 +1,11 @@
+Number of other hobos: 0Trials: 3 Average Time of Longest surviving Hobo: 32.4699536
+Number of other hobos: 0Trials: 3 Average Time of Longest surviving Hobo: 33.1712694
+Number of other hobos: 0Trials: 3 Average Time of Longest surviving Hobo: 38.837087
+Number of other hobos: 0Trials: 3 Average Time of Longest surviving Hobo: 32.3437815
+Number of other hobos: 0Trials: 3 Average Time of Longest surviving Hobo: 25.4932939
+Number of other hobos: 0Trials: 3 Average Time of Longest surviving Hobo: 39.5951116
+
+Number of other hobos: 1Trials: 3 Average Time of Longest surviving Hobo: 45.1612853
+Number of other hobos: 2Trials: 3 Average Time of Longest surviving Hobo: 43.6595166
+Number of other hobos: 4Trials: 3 Average Time of Longest surviving Hobo: 44.0332777
+Number of other hobos: 5Trials: 3 Average Time of Longest surviving Hobo: 47.9593988
