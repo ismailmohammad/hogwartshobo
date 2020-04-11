@@ -18,10 +18,10 @@ Project currently contains:
 
 
 Primary Project Backlog Editor: Madeed Srosh
-Primary Test Report Editor:
-Primary Test Plan Editor:
+Primary Test Report Editor: Madeed Srosh
+Primary Test Plan Editor: Ba Long Nguyen
 Primary Source Code Developer: Mohammad Ismail
-Results Checker(?):
+Results Checker: Mohammad Ismail
 
 Additional Contributions:
     --Additional Backlog Editors: Nicole Fiorante, Mohammad Ismail, Ba Long Nguyen, Aadhithya Anbu Ganesan
