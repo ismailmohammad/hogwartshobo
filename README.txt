@@ -9,7 +9,7 @@ To execute: navigate to /executable/hobo/ and then run hobo.exe either by double
   - The module pygame must also be installed on the machine. (pip install pygame or pip install pygame --user)
 ###
 
-Brought to you by (Group Members): Madeed Srosh (***REMOVED***), Nicole Fiorante (***REMOVED***), Mohammad Ismail (***REMOVED***), Ba Long Nguyen (***REMOVED***), Aadhithya Anbu Ganesan (***REMOVED***)
+Brought to you by (Group Members): Madeed Srosh (REMOVED), Nicole Fiorante (REMOVED), Mohammad Ismail (REMOVED), Ba Long Nguyen (REMOVED), Aadhithya Anbu Ganesan (REMOVED)
 
 Project currently contains:
   --Agile Project Backlog
