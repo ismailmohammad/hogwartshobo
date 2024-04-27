@@ -2,10 +2,11 @@ Hogwarts Hobo - The Game
 
 ## Manual Mode Demo
 
-
+https://github.com/ismailmohammad/hogwartshobo/assets/23105842/7b509fdf-c3f0-4bf4-8146-e7277302d269
 
 ## Automated Mode Demo
 
+https://github.com/ismailmohammad/hogwartshobo/assets/23105842/0a1ee674-6cf1-481b-bb7a-7928b8b31a82
 
 
 ### IMPORTANT ###
