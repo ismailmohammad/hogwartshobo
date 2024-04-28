@@ -47,3 +47,14 @@ Additional Contributions:
 - Additional Backlog Editors: Nicole Fiorante, Mohammad Ismail, Ba Long Nguyen, Aadhithya Anbu Ganesan
 - Additional Source Code Editors: Nicole Fiorante, Mohammad Ismail, Aadhithya Anbu Ganesan, Madeed Srosh, Ba Long Nguyen
 - Additional Test Editors: Mohammad Ismail, Aadhithya Anbu Ganesan, Madeed Srosh
+
+
+#### Additional Screenshots
+![Screenshot 2024-04-28 151311](https://github.com/ismailmohammad/hogwartshobo/assets/23105842/3fe64384-1112-4157-a20e-4645f3da9953)
+![Screenshot 2024-04-28 151451](https://github.com/ismailmohammad/hogwartshobo/assets/23105842/a111387b-0abf-4c9a-b311-bb5f22b468e6)
+![Screenshot 2024-04-28 151515](https://github.com/ismailmohammad/hogwartshobo/assets/23105842/b66b3b8e-5657-4bb7-ac1c-a35451e5ed56)
+![Screenshot 2024-04-28 151527](https://github.com/ismailmohammad/hogwartshobo/assets/23105842/48a7fe8a-ba12-4c44-a447-f2b2518dadbf)
+
+
+
+
